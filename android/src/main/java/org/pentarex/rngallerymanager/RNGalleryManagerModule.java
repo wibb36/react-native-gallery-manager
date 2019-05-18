@@ -23,7 +23,6 @@ public class RNGalleryManagerModule extends ReactContextBaseJavaModule {
     public static final String RNGALLERY_MANAGER = "RNGalleryManager";
     private static ReactApplicationContext reactContext = null;
 
-
     public RNGalleryManagerModule(ReactApplicationContext context) {
         super(context);
         reactContext = context;
@@ -33,7 +32,6 @@ public class RNGalleryManagerModule extends ReactContextBaseJavaModule {
     public String getName() {
         return RNGALLERY_MANAGER;
     }
-
 
     @ReactMethod
     public void getAssets(final ReadableMap params, final Promise promise) {
@@ -67,14 +65,14 @@ public class RNGalleryManagerModule extends ReactContextBaseJavaModule {
             gallery = GalleryCursorManager.getAssetCursor(requestedType, albumName, reactContext);
             WritableArray assets = new WritableNativeArray();
 
-            if(gallery.getCount() <= startFrom ) {
+            if (gallery.getCount() <= startFrom) {
                 promise.reject("gallery index out of bound", "");
                 return;
             } else {
                 response.putInt("totalAssets", gallery.getCount());
                 boolean hasMore = gallery.getCount() > startFrom + limit;
                 response.putBoolean("hasMore", hasMore);
-                if(hasMore) {
+                if (hasMore) {
                     response.putInt("next", startFrom + limit);
                 } else {
                     response.putInt("next", gallery.getCount());
@@ -85,7 +83,8 @@ public class RNGalleryManagerModule extends ReactContextBaseJavaModule {
             do {
                 WritableMap asset = getAsset(gallery);
                 assets.pushMap(asset);
-                if (gallery.getPosition() == (startFrom + limit) - 1) break;
+                if (gallery.getPosition() == (startFrom + limit) - 1)
+                    break;
             } while (gallery.moveToNext());
 
             response.putArray("assets", assets);
@@ -95,10 +94,10 @@ public class RNGalleryManagerModule extends ReactContextBaseJavaModule {
         } catch (SecurityException ex) {
             System.err.println(ex);
         } finally {
-            if (gallery != null) gallery.close();
+            if (gallery != null)
+                gallery.close();
         }
     }
-
 
     @ReactMethod
     public void getAlbums(final Promise promise) {
@@ -108,7 +107,6 @@ public class RNGalleryManagerModule extends ReactContextBaseJavaModule {
         }
 
         WritableMap response = new WritableNativeMap();
-
 
         Cursor gallery = null;
         try {
@@ -128,7 +126,8 @@ public class RNGalleryManagerModule extends ReactContextBaseJavaModule {
         } catch (SecurityException ex) {
             System.err.println(ex);
         } finally {
-            if (gallery != null) gallery.close();
+            if (gallery != null)
+                gallery.close();
         }
 
     }
@@ -142,8 +141,8 @@ public class RNGalleryManagerModule extends ReactContextBaseJavaModule {
         Double height = gallery.getDouble(gallery.getColumnIndex(MediaStore.Files.FileColumns.HEIGHT));
         Double width = gallery.getDouble(gallery.getColumnIndex(MediaStore.Files.FileColumns.WIDTH));
         String uri = "file://" + gallery.getString(gallery.getColumnIndex(MediaStore.Files.FileColumns.DATA));
+        String lowQualityUri = "file://" + gallery.getString(gallery.getColumnIndex(MediaStore.Files.FileColumns.DATA));
         Double id = gallery.getDouble(gallery.getColumnIndex(MediaStore.Files.FileColumns._ID));
-
 
         asset.putString("mimeType", mimeType);
         asset.putString("creationDate", creationDate);
@@ -152,6 +151,7 @@ public class RNGalleryManagerModule extends ReactContextBaseJavaModule {
         asset.putString("filename", fileName);
         asset.putDouble("id", id);
         asset.putString("uri", uri);
+        asset.putString("lowQualityUri", lowQualityUri);
 
         if (mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE) {
             asset.putDouble("duration", 0);
@@ -167,13 +167,13 @@ public class RNGalleryManagerModule extends ReactContextBaseJavaModule {
 
     private WritableMap getAlbum(Cursor gallery) {
         WritableMap album = new WritableNativeMap();
-        String albumName = gallery.getString(gallery.getColumnIndex(MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME));
+        String albumName = gallery
+                .getString(gallery.getColumnIndex(MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME));
         int assetCount = gallery.getInt(gallery.getColumnIndex("assetCount"));
         album.putString("title", albumName);
         album.putInt("assetCount", assetCount);
         return album;
     }
-
 
     private Boolean isJellyBeanOrLater() {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN;
